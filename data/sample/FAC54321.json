@@ -1,0 +1,18 @@
+{
+  "facility_id": "FAC54321",
+  "facility_name": "Green Valley Clinic",
+  "location": {
+    "address": "456 Elm St",
+    "city": "Green Valley",
+    "state": "CA",
+    "zip": "90210"
+  },
+  "employee_count": 85,
+  "services": ["Primary Care", "Pediatrics"],
+  "labs": [
+    { "lab_name": "Clinical Chemistry Lab", "certifications": ["CLIA"] }
+  ],
+  "accreditations": [
+    { "accreditation_body": "Joint Commission", "accreditation_id": "JC2002", "valid_until": "2024-09-30" }
+  ]
+}
