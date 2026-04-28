@@ -1,0 +1,18 @@
+{
+  "facility_id": "FAC67890",
+  "facility_name": "Lakeside Medical Center",
+  "location": {
+    "address": "789 Lake Rd",
+    "city": "Lakeside",
+    "state": "FL",
+    "zip": "32003"
+  },
+  "employee_count": 320,
+  "services": ["Orthopedics", "Cardiology", "Radiology", "Emergency Care"],
+  "labs": [
+    { "lab_name": "Pathology Lab", "certifications": ["CAP"] }
+  ],
+  "accreditations": [
+    { "accreditation_body": "NCQA", "accreditation_id": "NCQA700", "valid_until": "2025-12-31" }
+  ]
+}

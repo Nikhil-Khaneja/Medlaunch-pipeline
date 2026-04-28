@@ -1,0 +1,20 @@
+{
+  "facility_id": "FAC12345",
+  "facility_name": "City Hospital",
+  "location": {
+    "address": "123 Main St",
+    "city": "Metropolis",
+    "state": "TX",
+    "zip": "75001"
+  },
+  "employee_count": 250,
+  "services": ["Emergency Care", "Maternity", "Surgery", "Radiology", "Laboratory"],
+  "labs": [
+    { "lab_name": "Hematology Lab", "certifications": ["CLIA", "CAP"] },
+    { "lab_name": "Microbiology Lab", "certifications": ["CAP"] }
+  ],
+  "accreditations": [
+    { "accreditation_body": "Joint Commission", "accreditation_id": "JC1001", "valid_until": "2026-12-31" },
+    { "accreditation_body": "NCQA", "accreditation_id": "NCQA500", "valid_until": "2025-06-30" }
+  ]
+}
