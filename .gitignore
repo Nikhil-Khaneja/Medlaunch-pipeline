@@ -1,0 +1,49 @@
+# =============================================================================
+# MedLaunch Pipeline — .gitignore
+# =============================================================================
+
+# CRITICAL: Never commit credentials or secrets
+.env
+*.env
+.env.*
+!.env.example
+
+# AWS credentials file
+.aws/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+.venv/
+venv/
+env/
+ENV/
+
+# Pytest
+.pytest_cache/
+.coverage
+htmlcov/
+*.pytest_cache
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Temp files
+*.tmp
+*.log
