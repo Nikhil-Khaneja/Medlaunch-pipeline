@@ -1,0 +1,145 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Healthcare Analytics Pipeline - IAM roles and S3 buckets for Stages 1 and 2.
+  Deploys raw, filtered, and Athena-results buckets with least-privilege IAM role.
+
+Parameters:
+  BucketNamePrefix:
+    Type: String
+    Default: medlaunch-pipeline
+    Description: Prefix for all S3 bucket names (must be globally unique)
+
+Resources:
+
+  # -------------------------------------------------------------------------
+  # S3 Buckets
+  # -------------------------------------------------------------------------
+  RawDataBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "${BucketNamePrefix}-raw"
+      VersioningConfiguration:
+        Status: Enabled
+      Tags:
+        - Key: Project
+          Value: HealthcarePipeline
+        - Key: Stage
+          Value: Raw
+
+  FilteredDataBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "${BucketNamePrefix}-filtered"
+      Tags:
+        - Key: Project
+          Value: HealthcarePipeline
+        - Key: Stage
+          Value: Filtered
+
+  AthenaResultsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "${BucketNamePrefix}-athena-results"
+      Tags:
+        - Key: Project
+          Value: HealthcarePipeline
+        - Key: Stage
+          Value: AthenaResults
+
+  # -------------------------------------------------------------------------
+  # IAM Role — Least Privilege
+  # -------------------------------------------------------------------------
+  PipelineIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${BucketNamePrefix}-pipeline-role"
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+                - glue.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: HealthcarePipelineS3Policy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              # S3 access scoped to only the 3 pipeline buckets
+              - Sid: S3BucketAccess
+                Effect: Allow
+                Action:
+                  - s3:ListBucket
+                  - s3:GetBucketLocation
+                Resource:
+                  - !GetAtt RawDataBucket.Arn
+                  - !GetAtt FilteredDataBucket.Arn
+                  - !GetAtt AthenaResultsBucket.Arn
+              - Sid: S3ObjectAccess
+                Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:DeleteObject
+                Resource:
+                  - !Sub "${RawDataBucket.Arn}/*"
+                  - !Sub "${FilteredDataBucket.Arn}/*"
+                  - !Sub "${AthenaResultsBucket.Arn}/*"
+              # Athena query execution
+              - Sid: AthenaAccess
+                Effect: Allow
+                Action:
+                  - athena:StartQueryExecution
+                  - athena:GetQueryExecution
+                  - athena:GetQueryResults
+                  - athena:StopQueryExecution
+                  - athena:ListQueryExecutions
+                Resource: "*"
+              # Glue catalog (Athena requires this for table metadata)
+              - Sid: GlueCatalogAccess
+                Effect: Allow
+                Action:
+                  - glue:GetDatabase
+                  - glue:GetTable
+                  - glue:GetTables
+                  - glue:GetPartition
+                  - glue:GetPartitions
+                Resource: "*"
+              # CloudWatch Logs for Lambda execution logging
+              - Sid: CloudWatchLogsAccess
+                Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: "arn:aws:logs:*:*:*"
+      Tags:
+        - Key: Project
+          Value: HealthcarePipeline
+
+Outputs:
+  RawDataBucketName:
+    Description: Name of the S3 bucket for raw JSON facility data
+    Value: !Ref RawDataBucket
+    Export:
+      Name: !Sub "${AWS::StackName}-RawBucket"
+
+  FilteredDataBucketName:
+    Description: Name of the S3 bucket for filtered (expiring accreditation) records
+    Value: !Ref FilteredDataBucket
+    Export:
+      Name: !Sub "${AWS::StackName}-FilteredBucket"
+
+  AthenaResultsBucketName:
+    Description: Name of the S3 bucket for Athena query outputs
+    Value: !Ref AthenaResultsBucket
+    Export:
+      Name: !Sub "${AWS::StackName}-AthenaResultsBucket"
+
+  PipelineRoleArn:
+    Description: ARN of the IAM role for pipeline execution
+    Value: !GetAtt PipelineIAMRole.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-PipelineRoleArn"
