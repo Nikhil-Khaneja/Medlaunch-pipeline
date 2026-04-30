@@ -20,7 +20,7 @@ import json
 import logging
 import os
 from datetime import datetime, timedelta, timezone
-from typing import Any
+from typing import Any, List, Optional
 
 # Load local environment overrides if present — never committed to version control
 try:
@@ -57,7 +57,7 @@ def get_s3_client() -> Any:
     return boto3.client("s3", region_name=AWS_REGION)
 
 
-def list_json_files(s3: Any, bucket: str, prefix: str) -> list[str]:
+def list_json_files(s3: Any, bucket: str, prefix: str) -> List[str]:
     """
     List all .json object keys under the given S3 bucket/prefix.
 
@@ -71,7 +71,7 @@ def list_json_files(s3: Any, bucket: str, prefix: str) -> list[str]:
     Returns:
         List of S3 object keys ending in .json
     """
-    keys: list[str] = []
+    keys: List[str] = []
     paginator = s3.get_paginator("list_objects_v2")
     for page in paginator.paginate(Bucket=bucket, Prefix=prefix):
         for obj in page.get("Contents", []):
@@ -82,7 +82,7 @@ def list_json_files(s3: Any, bucket: str, prefix: str) -> list[str]:
     return keys
 
 
-def read_facility(s3: Any, bucket: str, key: str) -> dict | None:
+def read_facility(s3: Any, bucket: str, key: str) -> Optional[dict]:
     """
     Download and parse a single facility JSON record from S3.
 

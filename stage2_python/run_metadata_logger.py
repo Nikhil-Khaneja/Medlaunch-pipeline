@@ -37,7 +37,7 @@ import json
 import logging
 import os
 from datetime import datetime, timezone
-from typing import Any
+from typing import Any, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -68,15 +68,15 @@ class RunMetadata:
                     (bucket names, prefix, expiry window, etc.)
         """
         self.config        = config
-        self.started_at: datetime | None    = None
-        self.completed_at: datetime | None  = None
+        self.started_at: Optional[datetime]    = None
+        self.completed_at: Optional[datetime]  = None
         self.status        = "pending"
         self.files_found   = 0
         self.processed     = 0
         self.filtered      = 0
         self.skipped       = 0
         self.errors        = 0
-        self._error_detail: list[dict] = []
+        self._error_detail: List[dict] = []
 
     def start(self) -> None:
         """Mark the start time of the pipeline run."""
